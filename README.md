@@ -1,8 +1,8 @@
-# 🤖 Pwnagotchi Analyzer
+# Pwnagotchi Analyzer
 
 Interface web dockerisée pour analyser les captures WiFi de votre Pwnagotchi de manière éthique et sécurisée.
 
-## ⚠️ DISCLAIMER IMPORTANT
+## DISCLAIMER IMPORTANT
 
 **CET OUTIL EST DESTINÉ UNIQUEMENT À UN USAGE ÉTHIQUE ET LÉGAL :**
 - ✅ Testez uniquement vos propres réseaux WiFi
@@ -14,10 +14,10 @@ Interface web dockerisée pour analyser les captures WiFi de votre Pwnagotchi de
 ## 🚀 Fonctionnalités
 
 ### Interface Web Intuitive
-- 📁 Upload de fichiers PCAP/CAP
-- 🎯 Sélection de dictionnaires de mots de passe
-- 📊 Suivi en temps réel des analyses
-- 📈 Historique et statistiques
+- Upload de fichiers PCAP/CAP
+- Sélection de dictionnaires de mots de passe
+- Suivi en temps réel des analyses
+- Historique et statistiques
 
 ### Outils Intégrés
 - **Hashcat** - Crackage GPU/CPU optimisé
@@ -170,4 +170,4 @@ Les contributions sont bienvenues ! Merci de :
 - Documenter vos modifications
 - Tester avant de soumettre
 
-**Utilisez de manière responsable et éthique ! 🛡️**
+**Utilisez de manière responsable et éthique ! **

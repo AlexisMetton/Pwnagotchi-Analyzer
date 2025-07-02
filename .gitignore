@@ -7,7 +7,7 @@ config/*
 
 # Sauf le fichier .gitkeep
 !results/.gitkeep
-!captures/.gitkeep
+!captures/test.pcap
 !logs/.gitkeep
 !wordlists/.gitkeep
 !config/.gitkeep
