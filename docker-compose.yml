@@ -1,0 +1,31 @@
+services:
+  pwnagotchi-analyzer:
+    build: .
+    container_name: pwnagotchi-analyzer
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./captures:/app/captures
+      - ./results:/app/results
+      # - ./wordlists:/app/wordlists
+      - ./logs:/app/logs
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    restart: unless-stopped
+    
+  # Optionnel: Base de données pour historique
+  postgres:
+    image: postgres:13
+    container_name: pwnagotchi-db
+    environment:
+      POSTGRES_DB: pwnagotchi_analyzer
+      POSTGRES_USER: analyzer
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

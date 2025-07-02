@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pwnagotchi Analyzer</title>
+    <link rel="icon" type="image/png" href="/static/favicon.ico">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #f7f8fa;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        }
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-link {
+            color: #222;
+            font-weight: 500;
+            margin-right: 1rem;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0d6efd;
+        }
+        .main-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            padding: 2.5rem 2rem;
+            margin-top: 3rem;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .btn-primary {
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        .upload-area {
+            border: 2px dashed #bfc7d1;
+            border-radius: 10px;
+            padding: 32px;
+            text-align: center;
+            background: #f7f8fa;
+            transition: border-color 0.2s;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #0d6efd;
+        }
+        .footer {
+            margin-top: 4rem;
+            padding: 1.5rem 0 0.5rem 0;
+            color: #888;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .warning-banner {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 24px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-robot text-primary"></i> Pwnagotchi Analyzer
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/tasks">Tâches</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 80px;">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="main-card">
+                    <div class="text-center mb-4">
+                        <h2 class="mb-1"><i class="fas fa-upload text-primary"></i> Analyser une capture</h2>
+                        <div class="warning-banner mt-3">
+                            ⚠️ Usage éthique uniquement — Analysez uniquement vos propres réseaux ou avec autorisation explicite
+                        </div>
+                    </div>
+                    <!-- Messages Flash -->
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <!-- Upload Form -->
+                    <form method="POST" action="/upload" enctype="multipart/form-data">
+                        <div class="upload-area mb-4" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
+                            <div class="fw-semibold">Cliquez pour sélectionner un fichier</div>
+                            <div class="text-muted" style="font-size:0.97rem;">Formats supportés : .pcap, .cap, .hccapx, .hc22000</div>
+                            <input type="file" id="fileInput" name="file" accept=".pcap,.cap,.hccapx,.hc22000" style="display: none;" required>
+                            <span id="fileName" class="text-primary fw-bold"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label for="wordlist" class="form-label">
+                                <i class="fas fa-list"></i> Dictionnaire de mots de passe
+                            </label>
+                            <select class="form-select" id="wordlist" name="wordlist" required>
+                                <option value="">Choisir un dictionnaire...</option>
+                                {% for wl in wordlists %}
+                                    <option value="{{ wl.name }}">{{ wl.name }} ({{ wl.size }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-rocket"></i> Lancer l'analyse
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            &copy; {{ current_year }} Pwnagotchi Analyzer &mdash; Interface d'analyse WiFi<br>
+            <span style="font-size:0.95em;">Projet éducatif et éthique</span>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        // Affichage du nom de fichier sélectionné
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || '';
+            document.getElementById('fileName').textContent = fileName;
+        });
+    </script>
+</body>
+</html>

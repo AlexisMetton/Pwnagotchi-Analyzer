@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Statut de la tâche</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/favicon.ico">
+    <style>
+        body {
+            background: #f7f8fa;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        }
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-link {
+            color: #222;
+            font-weight: 500;
+            margin-right: 1rem;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0d6efd;
+        }
+        .main-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            padding: 2.5rem 2rem;
+            margin-top: 3rem;
+        }
+        .footer {
+            margin-top: 4rem;
+            padding: 1.5rem 0 0.5rem 0;
+            color: #888;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .list-group-item {
+            font-size: 1.08rem;
+        }
+        .progress {
+            height: 1.3rem;
+            border-radius: 8px;
+        }
+        .progress-bar {
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-robot text-primary"></i> Pwnagotchi Analyzer
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/tasks">Tâches</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container" style="margin-top: 80px;">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="main-card">
+                    <h2 class="mb-4 text-center">Statut de la tâche</h2>
+                    {% if task %}
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item"><strong>ID :</strong> <span id="task-id">{{ task.id }}</span></li>
+                            <li class="list-group-item"><strong>Fichier :</strong> <span id="filename">{{ task.filename }}</span></li>
+                            <li class="list-group-item"><strong>Dictionnaire :</strong> <span id="wordlist">{{ task.wordlist }}</span></li>
+                            <li class="list-group-item"><strong>Statut :</strong> <span id="status" class="badge {% if task.status == 'completed' %}bg-success{% elif task.status == 'failed' %}bg-danger{% else %}bg-primary{% endif %}">{{ task.status }}</span></li>
+                            <li class="list-group-item">
+                                <strong>Progression :</strong>
+                                <div class="progress mt-2">
+                                    <div id="progress-bar" class="progress-bar" role="progressbar" style="width: {{ task.progress }}%" aria-valuenow="{{ task.progress }}" aria-valuemin="0" aria-valuemax="100">{{ task.progress }}%</div>
+                                </div>
+                            </li>
+                            {% if task.result %}
+                                <li class="list-group-item">
+                                    <div class="alert alert-success mb-0"><strong>Succès :</strong> Mot de passe trouvé&nbsp;!</div>
+                                    <strong>Résultat :</strong> <pre id="result">{{ task.result }}</pre>
+                                </li>
+                            {% endif %}
+                            {% if task.error %}
+                                <li class="list-group-item">
+                                    {% if 'Aucun mot de passe du dictionnaire' in task.error %}
+                                        <div class="alert alert-warning mb-0"><strong>Échec :</strong> {{ task.error }}</div>
+                                    {% else %}
+                                        <div class="alert alert-danger mb-0"><strong>Erreur technique :</strong> {{ task.error }}</div>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-warning">Aucune information sur la tâche.</div>
+                    {% endif %}
+                    <div class="text-center">
+                        <a href="/" class="btn btn-outline-primary me-2">Accueil</a>
+                        <a href="/tasks" class="btn btn-outline-secondary">Voir toutes les tâches</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            &copy; {{ current_year }} Pwnagotchi Analyzer &mdash; Interface d'analyse WiFi<br>
+            <span style="font-size:0.95em;">Projet éducatif et éthique</span>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        // Mise à jour automatique du statut si la tâche est en cours
+        {% if task and task.status == 'running' %}
+        function updateStatus() {
+            fetch('/api/task/{{ task.id }}/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').textContent = data.status;
+                    document.getElementById('status').className = data.status === 'completed' ? 'badge bg-success' : 
+                                                               data.status === 'failed' ? 'badge bg-danger' : 'badge bg-primary';
+                    document.getElementById('progress-bar').style.width = data.progress + '%';
+                    document.getElementById('progress-bar').textContent = data.progress + '%';
+                    document.getElementById('progress-bar').setAttribute('aria-valuenow', data.progress);
+                    if (data.result) {
+                        const resultElement = document.getElementById('result');
+                        if (!resultElement) {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item';
+                            li.innerHTML = '<strong>Résultat :</strong> <pre id="result">' + data.result + '</pre>';
+                            document.querySelector('.list-group').appendChild(li);
+                        } else {
+                            resultElement.textContent = data.result;
+                        }
+                    }
+                    if (data.error) {
+                        const errorElement = document.getElementById('error');
+                        if (!errorElement) {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item text-danger';
+                            li.innerHTML = '<strong>Erreur :</strong> <span id="error">' + data.error + '</span>';
+                            document.querySelector('.list-group').appendChild(li);
+                        } else {
+                            errorElement.textContent = data.error;
+                        }
+                    }
+                    if (data.status === 'running') {
+                        setTimeout(updateStatus, 2000);
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
+        }
+        setTimeout(updateStatus, 2000);
+        {% endif %}
+    </script>
+</body>
+</html> 

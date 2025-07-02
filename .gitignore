@@ -1,0 +1,13 @@
+# Ignorer tout dans results/
+results/*
+captures/*
+logs/*
+wordlists/*
+config/*
+
+# Sauf le fichier .gitkeep
+!results/.gitkeep
+!captures/.gitkeep
+!logs/.gitkeep
+!wordlists/.gitkeep
+!config/.gitkeep
